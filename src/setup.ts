@@ -1,59 +1,60 @@
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { StartedTestContainer } from "testcontainers/dist/test-container";
-import configReader, { SingleContainerConfig } from "./config";
-import { buildTestcontainer } from "./containers";
+import configReader, { JestTestcontainersConfig } from "./config";
+import { startContainer, StartedContainerAndMetaInfo } from "./containers";
 
 const GLOBAL_VARS_JSON_PATH = join(__dirname, "global.vars.json");
 const createEnv = (name: string, key: string) =>
   `__TESTCONTAINERS_${name.toUpperCase()}_${key.toUpperCase()}__`;
 
-async function startContainer(
-  containerConfig: SingleContainerConfig
-): Promise<StartedTestContainer> {
-  const container = buildTestcontainer(containerConfig);
-  return container.start();
+type AllStartedContainersMetaInfo = {
+  [key: string]: StartedContainerAndMetaInfo;
+};
+async function startAllContainers(
+  config: JestTestcontainersConfig
+): Promise<AllStartedContainersMetaInfo> {
+  const containerKeys = Object.keys(config);
+  const containerConfigs = Object.values(config);
+  const startedContainersMetaInfos = await Promise.all(
+    containerConfigs.map(startContainer)
+  );
+
+  return containerKeys.reduce(
+    (acc, key, idx) => ({ ...acc, [key]: startedContainersMetaInfos[idx] }),
+    {}
+  );
 }
 
-export function getMetaInfo(container: StartedTestContainer, ports?: number[]) {
-  return {
-    ip: container.getContainerIpAddress(),
-    portMappings: (ports || []).reduce(
-      (acc: any, p: number) => ({ ...acc, [p]: container.getMappedPort(p) }),
-      {}
-    )
-  };
+function createGlobalVariablesFromMetaInfos(
+  metaInfos: AllStartedContainersMetaInfo
+) {
+  const containerKeys = Object.keys(metaInfos);
+
+  return containerKeys.reduce((acc: any, containerKey: string, idx: number) => {
+    const { ip, portMappings } = metaInfos[containerKey];
+
+    acc[createEnv(containerKey, "IP")] = ip;
+    for (const [originalPort, boundPort] of portMappings.entries()) {
+      acc[createEnv(containerKey, `PORT_${originalPort}`)] = boundPort;
+    }
+
+    return acc;
+  }, {});
 }
 
 async function setup() {
-  const containerConfigs = configReader();
-  const containerKeys = Object.keys(containerConfigs);
-  const containers = await Promise.all(
-    containerKeys.map(containerKey =>
-      startContainer(containerConfigs[containerKey])
-    )
+  const jestTestcontainersConfig = configReader();
+  const allStartedContainersMetaInfo = await startAllContainers(
+    jestTestcontainersConfig
   );
-  const globalEnv = containerKeys.reduce(
-    (acc: any, containerKey: string, idx: number) => {
-      const container = containers[idx];
-      const { ip, portMappings } = getMetaInfo(
-        container,
-        containerConfigs[containerKey].ports
-      );
-
-      acc[createEnv(containerKey, "IP")] = ip;
-      Object.keys(portMappings).forEach(originalPort => {
-        acc[createEnv(containerKey, `PORT_${originalPort}`)] =
-          portMappings[originalPort];
-      });
-
-      return acc;
-    },
-    {}
+  const globalEnv = createGlobalVariablesFromMetaInfos(
+    allStartedContainersMetaInfo
   );
 
   writeFileSync(GLOBAL_VARS_JSON_PATH, JSON.stringify(globalEnv), "utf-8");
-  global.__TESTCONTAINERS__ = containers as GlobalStartedTestContainer[];
+  global.__TESTCONTAINERS__ = Object.values(allStartedContainersMetaInfo).map(
+    ({ container }) => container
+  ) as GlobalStartedTestContainer[];
 }
 
 module.exports = setup;

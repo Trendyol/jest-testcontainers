@@ -1,6 +1,10 @@
 import { Duration, TemporalUnit } from "node-duration";
+import { start } from "repl";
 import { GenericContainer, Wait } from "testcontainers";
-import { TestContainer } from "testcontainers/dist/test-container";
+import {
+  StartedTestContainer,
+  TestContainer
+} from "testcontainers/dist/test-container";
 import {
   EnvironmentVariableMap,
   SingleContainerConfig,
@@ -58,4 +62,35 @@ export function buildTestcontainer(
     image,
     tag
   ) as TestContainer);
+}
+
+export interface StartedContainerAndMetaInfo {
+  ip: string;
+  portMappings: Map<number, number>;
+  container: StartedTestContainer;
+}
+
+function getMetaInfo(
+  container: StartedTestContainer,
+  ports?: number[]
+): StartedContainerAndMetaInfo {
+  const portMappings = new Map<number, number>();
+
+  return {
+    container,
+    ip: container.getContainerIpAddress(),
+    portMappings: (ports || []).reduce(
+      (mapping, p: number) => mapping.set(p, container.getMappedPort(p)),
+      portMappings
+    )
+  };
+}
+
+export async function startContainer(
+  containerConfig: SingleContainerConfig
+): Promise<StartedContainerAndMetaInfo> {
+  const container = buildTestcontainer(containerConfig);
+  const startedContainer = await container.start();
+
+  return getMetaInfo(startedContainer, containerConfig.ports);
 }
