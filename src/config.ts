@@ -1,6 +1,6 @@
 import cwd from "cwd";
 import { existsSync } from "fs";
-import { resolve } from "path";
+import { isAbsolute, resolve } from "path";
 
 function readJsFile(file: string) {
   try {
@@ -42,10 +42,18 @@ function parseContainerConfig({ image, tag, port, ports, wait, env }: any) {
   return { image, tag, port, ports, wait, env };
 }
 
+function getConfigPath(envValue?: string): string {
+  if (!envValue) {
+    return resolve(cwd(), "jest-testcontainers-config.js");
+  }
+  if (isAbsolute(envValue)) {
+    return envValue;
+  }
+  return resolve(cwd(), envValue);
+}
+
 function readConfig(): any {
-  const configPath =
-    process.env.JEST_TESTCONTAINERS_CONFIG_PATH ||
-    resolve(cwd(), "jest-testcontainers-config.js");
+  const configPath = getConfigPath(process.env.JEST_TESTCONTAINERS_CONFIG_PATH);
   if (!existsSync(configPath)) {
     throw new Error(`config file could not be found at: ${configPath}`);
   }

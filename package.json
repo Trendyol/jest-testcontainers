@@ -14,10 +14,15 @@
     "lint": "tslint --fix src/**/*.ts",
     "prettier": "prettier --write src/**/*.ts",
     "style:fix": "npm run lint && npm run prettier",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "example:redis": "cd ./examples/01-basic-redis && jest"
   },
   "lint-staged": {
-    "*.ts": ["tslint --fix", "prettier --write", "git add"]
+    "*.ts": [
+      "tslint --fix",
+      "prettier --write",
+      "git add"
+    ]
   },
   "husky": {
     "hooks": {
@@ -50,6 +55,7 @@
     "jest": "^24.9.0",
     "lint-staged": "^9.2.3",
     "prettier": "^1.18.2",
+    "redis": "^2.8.0",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
