@@ -4,8 +4,8 @@ module.exports = {
     tag: '5.0.5',
     ports: [6379],
     wait: {
-      type: 'second',
-      second: 5
+      type: 'ports',
+      timeout: 5
     }
   }
 };

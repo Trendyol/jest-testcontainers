@@ -2,44 +2,98 @@ import cwd from "cwd";
 import { existsSync } from "fs";
 import { isAbsolute, resolve } from "path";
 
-function readJsFile(file: string) {
-  try {
-    return require(file);
-  } catch (e) {
-    throw new Error(`could not read file ${file} as js file: ${e.message}`);
+class JestTestcontainersConfigError extends Error {
+  constructor(msg: string) {
+    super(msg);
+    this.name = this.constructor.name;
   }
 }
 
-function parseContainerConfig({ image, tag, port, ports, wait, env }: any) {
+export interface JestTestcontainersConfig {
+  [key: string]: SingleContainerConfig;
+}
+
+interface SingleContainerConfig {
+  image: string;
+  tag?: string;
+  ports?: number[];
+  env?: { [key: string]: string };
+  wait?: PortsWaitConfig | TextWaitConfig;
+}
+
+interface PortsWaitConfig {
+  type: "ports";
+  timeout: number;
+}
+
+interface TextWaitConfig {
+  type: "text";
+  text: string;
+}
+
+function assertWaitConfig(wait: any): void {
+  if (wait === undefined) {
+    return;
+  }
+  if (!["ports", "text"].includes(wait.type)) {
+    throw new JestTestcontainersConfigError("wait can be ports or text");
+  }
+  if (wait && wait.type === "ports" && !Number.isInteger(wait.timeout)) {
+    throw new JestTestcontainersConfigError(
+      "wait type ports requires timeout field as integer"
+    );
+  }
+  if (wait && wait.type === "text" && !wait.text) {
+    throw new JestTestcontainersConfigError(
+      "wait type text requires a text to wait for"
+    );
+  }
+}
+
+function assertContainerConfigIsValid({
+  image,
+  tag,
+  ports,
+  wait,
+  env
+}: any): void {
   if (!image || image.constructor !== String || image.trim().length <= 0) {
-    throw new Error("an image should be presented");
+    throw new JestTestcontainersConfigError("an image should be presented");
   }
   if (
     tag !== undefined &&
     (tag.constructor !== String || image.trim().length <= 0)
   ) {
-    throw new Error("tag is optional but should be string");
+    throw new JestTestcontainersConfigError(
+      "tag is optional but should be string"
+    );
   }
   if (
-    !Number.isInteger(port) &&
-    (!ports || ports.constructor !== Array || !ports.every(Number.isInteger))
+    ports !== undefined &&
+    (ports.constructor !== Array || !ports.every(Number.isInteger))
   ) {
-    throw new Error("you should either give a port or list of ports");
-  }
-  if (!wait || !["second", "text"].includes(wait.type)) {
-    throw new Error("wait can be second or text");
-  }
-  if (wait.type === "second" && !Number.isInteger(wait.second)) {
-    throw new Error("wait type second requires second field as integer");
-  }
-  if (wait.type === "text" && !wait.text) {
-    throw new Error("wait type text requires a text to wait for");
+    throw new JestTestcontainersConfigError(
+      "ports should be a list of numbers"
+    );
   }
   if (env !== undefined && env.constructor !== Object) {
-    throw new Error("env should be an object of env key to value");
+    throw new JestTestcontainersConfigError(
+      "env should be an object of env key to value"
+    );
   }
 
-  return { image, tag, port, ports, wait, env };
+  assertWaitConfig(wait);
+}
+
+function parseContainerConfig(config: any): JestTestcontainersConfig {
+  assertContainerConfigIsValid(config);
+  const { image, tag, ports, env, wait } = config;
+  const parsed = { image, tag, ports, env, wait };
+
+  return Object.keys(parsed).reduce(
+    (acc, key) => (key !== undefined ? { ...acc, [key]: config[key] } : acc),
+    {}
+  ) as JestTestcontainersConfig;
 }
 
 function getConfigPath(envValue?: string): string {
@@ -52,14 +106,32 @@ function getConfigPath(envValue?: string): string {
   return resolve(cwd(), envValue);
 }
 
-function readConfig(): any {
-  const configPath = getConfigPath(process.env.JEST_TESTCONTAINERS_CONFIG_PATH);
-  if (!existsSync(configPath)) {
-    throw new Error(`config file could not be found at: ${configPath}`);
+function readJsFile(file: string): any {
+  try {
+    return require(file);
+  } catch (e) {
+    throw new JestTestcontainersConfigError(
+      `could not read file ${file} as js file: ${e.message}`
+    );
   }
-  const containerConfigs = readJsFile(configPath);
+}
+
+function readConfig(envValue?: string): JestTestcontainersConfig {
+  const configPath = getConfigPath(envValue);
+  if (!existsSync(configPath)) {
+    throw new JestTestcontainersConfigError(
+      `config file could not be found at: ${configPath}`
+    );
+  }
+
+  return readJsFile(configPath);
+}
+
+export function parseConfig(containerConfigs: any) {
   if (!containerConfigs || Object.keys(containerConfigs).length < 1) {
-    throw new Error("testcontainers config can not be empty");
+    throw new JestTestcontainersConfigError(
+      "testcontainers config can not be empty"
+    );
   }
 
   return Object.keys(containerConfigs).reduce(
@@ -71,4 +143,5 @@ function readConfig(): any {
   );
 }
 
-export default readConfig;
+export default (): JestTestcontainersConfig =>
+  parseConfig(readConfig(process.env.JEST_TESTCONTAINERS_CONFIG_PATH));
