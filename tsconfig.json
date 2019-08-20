@@ -1,0 +1,23 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "es6",
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "declaration": true,
+    "lib": ["es2017"],
+    "esModuleInterop": true,
+    "strict": true,
+    "removeComments": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.spec.ts"
+  ],
+  "types": [
+    "./@types",
+    "./types/global.d.ts"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "name": "jest-testcontainers",
+  "version": "1.0.0-rc.0",
+  "description": "Jest preset for starting docker containers that stay up whilist your tests run.",
+  "main": "dist/index",
+  "types": "dist/index",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "test": "jest",
+    "lint": "tslint --fix src/**/*.ts",
+    "prettier": "prettier --write src/**/*.ts",
+    "style:fix": "npm run lint && npm run prettier",
+    "prepublish": "npm run build"
+  },
+  "lint-staged": {
+    "*.ts": ["tslint --fix", "prettier --write", "git add"]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && npm test"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trendyol/jest-testcontainers.git"
+  },
+  "keywords": [
+    "jest",
+    "testcontainers",
+    "docker",
+    "integration",
+    "test"
+  ],
+  "author": "Trendyol",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Trendyol/jest-testcontainers/issues"
+  },
+  "homepage": "https://github.com/Trendyol/jest-testcontainers#readme",
+  "devDependencies": {
+    "@types/cwd": "^0.10.0",
+    "@types/dockerode": "^2.5.20",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.2",
+    "husky": "^3.0.4",
+    "jest": "^24.9.0",
+    "lint-staged": "^9.2.3",
+    "prettier": "^1.18.2",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "cwd": "^0.10.0",
+    "jest-environment-node": "^24.9.0",
+    "testcontainers": "^1.2.0"
+  }
+}
