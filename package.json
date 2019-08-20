@@ -65,6 +65,7 @@
   "dependencies": {
     "cwd": "^0.10.0",
     "jest-environment-node": "^24.9.0",
+    "node-duration": "^1.0.4",
     "testcontainers": "^1.2.0"
   }
 }

@@ -1,42 +1,24 @@
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { GenericContainer, Wait } from "testcontainers";
 import { StartedTestContainer } from "testcontainers/dist/test-container";
-import configReader from "./config";
+import configReader, { SingleContainerConfig } from "./config";
+import { buildTestcontainer } from "./containers";
 
 const GLOBAL_VARS_JSON_PATH = join(__dirname, "global.vars.json");
 const createEnv = (name: string, key: string) =>
   `__TESTCONTAINERS_${name.toUpperCase()}_${key.toUpperCase()}__`;
 
-async function startContainer({
-  image,
-  tag,
-  port,
-  ports,
-  wait,
-  env = {}
-}: any): Promise<StartedTestContainer> {
-  const { type: waitType, second: waitSecond, text: waitText } = wait;
-  const allPorts = port ? [port] : ports;
-  const textStrategy =
-    waitType === "text" ? Wait.forLogMessage(waitText) : undefined;
-
-  const containerBootstrap = Object.keys(env).reduce(
-    (bootstrap, key) => bootstrap.withEnv(key, env[key]),
-    textStrategy
-      ? new GenericContainer(image, tag).withWaitStrategy(textStrategy)
-      : new GenericContainer(image, tag).withStartupTimeout(waitSecond)
-  );
-
-  return containerBootstrap.withExposedPorts(...allPorts).start();
+async function startContainer(
+  containerConfig: SingleContainerConfig
+): Promise<StartedTestContainer> {
+  const container = buildTestcontainer(containerConfig);
+  return container.start();
 }
 
-function getMetaInfo(container: StartedTestContainer, { port, ports }: any) {
-  const allPorts = port ? [port] : ports;
-
+export function getMetaInfo(container: StartedTestContainer, ports?: number[]) {
   return {
     ip: container.getContainerIpAddress(),
-    portMappings: allPorts.reduce(
+    portMappings: (ports || []).reduce(
       (acc: any, p: number) => ({ ...acc, [p]: container.getMappedPort(p) }),
       {}
     )
@@ -56,7 +38,7 @@ async function setup() {
       const container = containers[idx];
       const { ip, portMappings } = getMetaInfo(
         container,
-        containerConfigs[containerKey]
+        containerConfigs[containerKey].ports
       );
 
       acc[createEnv(containerKey, "IP")] = ip;

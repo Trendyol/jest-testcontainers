@@ -9,16 +9,19 @@ class JestTestcontainersConfigError extends Error {
   }
 }
 
+export type EnvironmentVariableMap = { [key: string]: string };
+export type WaitConfig = PortsWaitConfig | TextWaitConfig;
+
 export interface JestTestcontainersConfig {
   [key: string]: SingleContainerConfig;
 }
 
-interface SingleContainerConfig {
+export interface SingleContainerConfig {
   image: string;
   tag?: string;
   ports?: number[];
-  env?: { [key: string]: string };
-  wait?: PortsWaitConfig | TextWaitConfig;
+  env?: EnvironmentVariableMap;
+  wait?: WaitConfig;
 }
 
 interface PortsWaitConfig {
