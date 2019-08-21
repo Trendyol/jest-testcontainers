@@ -53,15 +53,13 @@ export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
   const { image, tag, ports, env, wait } = containerConfig;
+  const container: TestContainer = new GenericContainer(image, tag);
 
   return [
     addPortsToContainer(ports),
     addEnvironmentVariablesToContainer(env),
     addWaitStrategyToContainer(wait)
-  ].reduce((res, func) => func(res), new GenericContainer(
-    image,
-    tag
-  ) as TestContainer);
+  ].reduce((res, func) => func(res), container);
 }
 
 export interface StartedContainerAndMetaInfo {

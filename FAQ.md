@@ -12,6 +12,7 @@ const testcontainers_preset = require('@trendyol/jest-testcontainers/jest-preset
 module.exports = {
 	...ts_preset,
 	...testcontainers_preset,
+};
 ```
 
 and use this file in your *jest.config.js*:
@@ -20,3 +21,5 @@ module.exports = {
   preset: './preset.js',
 };
 ```
+
+See [examples/02-typescript-redis](./examples/02-typescript-redis) for a working example.

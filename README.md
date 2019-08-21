@@ -1,5 +1,5 @@
 # jest-testcontainers
-Jest preset for running docker containers with your tests. Primary purpose is to make it possible to use any database for integration tests. Docker containers will be created before your tests run, and stopped after your tests finish. Using [testcontainers-node](https://github.com/testcontainers/testcontainers-node) under the hood. Inspired by [@shelf/jest-mongodb](https://github.com/shelfio/jest-mongodb).
+Jest preset for running docker containers with your tests. Primary purpose is to make it possible to use any database in integration tests. Since it uses docker images, custom database images with different plugins/configurations can be used in the integration tests. Using [testcontainers-node](https://github.com/testcontainers/testcontainers-node) under the hood. Inspired by [@shelf/jest-mongodb](https://github.com/shelfio/jest-mongodb).
 
 ## Usage
 ### Install
@@ -26,6 +26,7 @@ module.exports = {
     ports: [6379],
   },
   neo4j: { 
+    // can put custom images as well
     image: 'neo4j',
     tag: '3.5.7',
     ports: [7687],

@@ -15,7 +15,8 @@
     "prettier": "prettier --write src/**/*.ts",
     "style:fix": "npm run lint && npm run prettier",
     "prepublish": "npm run build",
-    "example:redis": "cd ./examples/01-basic-redis && jest"
+    "example:redis": "cd ./examples/01-basic-redis && jest",
+    "example:redis-typescript": "cd ./examples/02-typescript-redis && jest"
   },
   "lint-staged": {
     "*.ts": [
@@ -51,6 +52,7 @@
     "@types/dockerode": "^2.5.20",
     "@types/jest": "^24.0.18",
     "@types/node": "^12.7.2",
+    "@types/redis": "^2.8.13",
     "husky": "^3.0.4",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.3",
