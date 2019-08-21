@@ -58,7 +58,7 @@ describe('redis example suite', () => {
     const redisConnectionURI = `redis://${global.__TESTCONTAINERS_REDIS_IP__}:${global.__TESTCONTAINERS_REDIS_PORT_6379__}`;
     redisClient = redis.createClient(redisConnectionURI);
     
-    // const neo4jConnectionURI = `bolt://${this.global.__TESTCONTAINERS_NEO4J_IP__}:${this.global.__TESTCONTAINERS_NEO4J_PORT_7687__}`;
+    // const neo4jConnectionURI = `bolt://${global.__TESTCONTAINERS_NEO4J_IP__}:${global.__TESTCONTAINERS_NEO4J_PORT_7687__}`;
     // use the neo4j connection uri to create a client
   });
 
