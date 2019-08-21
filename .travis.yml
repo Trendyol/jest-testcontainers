@@ -1,0 +1,6 @@
+language: node_js
+script:
+  - npm test
+  - npm run build
+  - npm run example:redis
+  - npm run example:redis-typescript
