@@ -1,5 +1,4 @@
 import { Duration, TemporalUnit } from "node-duration";
-import { start } from "repl";
 import { GenericContainer, Wait } from "testcontainers";
 import {
   StartedTestContainer,
@@ -7,6 +6,7 @@ import {
 } from "testcontainers/dist/test-container";
 import {
   EnvironmentVariableMap,
+  JestTestcontainersConfig,
   SingleContainerConfig,
   WaitConfig
 } from "./config";
@@ -70,7 +70,7 @@ export interface StartedContainerAndMetaInfo {
   container: StartedTestContainer;
 }
 
-function getMetaInfo(
+export function getMetaInfo(
   container: StartedTestContainer,
   ports?: number[]
 ): StartedContainerAndMetaInfo {
@@ -80,17 +80,41 @@ function getMetaInfo(
     container,
     ip: container.getContainerIpAddress(),
     portMappings: (ports || []).reduce(
-      (mapping, p: number) => mapping.set(p, container.getMappedPort(p)),
+      (mapping, p: number) =>
+        container.getMappedPort(p)
+          ? mapping.set(p, container.getMappedPort(p))
+          : mapping,
       portMappings
     )
   };
 }
 
 export async function startContainer(
-  containerConfig: SingleContainerConfig
+  containerConfig: SingleContainerConfig,
+  containerBuilderFn: typeof buildTestcontainer = buildTestcontainer,
+  infoGetterFn: typeof getMetaInfo = getMetaInfo
 ): Promise<StartedContainerAndMetaInfo> {
-  const container = buildTestcontainer(containerConfig);
+  const container = containerBuilderFn(containerConfig);
   const startedContainer = await container.start();
 
-  return getMetaInfo(startedContainer, containerConfig.ports);
+  return infoGetterFn(startedContainer, containerConfig.ports);
+}
+
+export type AllStartedContainersAndMetaInfo = {
+  [key: string]: StartedContainerAndMetaInfo;
+};
+export async function startAllContainers(
+  config: JestTestcontainersConfig,
+  startContainerFn: typeof startContainer = startContainer
+): Promise<AllStartedContainersAndMetaInfo> {
+  const containerKeys = Object.keys(config);
+  const containerConfigs = Object.values(config);
+  const startedContainersMetaInfos = await Promise.all(
+    containerConfigs.map(containerConfig => startContainerFn(containerConfig))
+  );
+
+  return containerKeys.reduce(
+    (acc, key, idx) => ({ ...acc, [key]: startedContainersMetaInfos[idx] }),
+    {}
+  );
 }

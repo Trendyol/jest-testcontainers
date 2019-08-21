@@ -1,32 +1,17 @@
 import { writeFileSync } from "fs";
 import { join } from "path";
-import configReader, { JestTestcontainersConfig } from "./config";
-import { startContainer, StartedContainerAndMetaInfo } from "./containers";
+import configReader from "./config";
+import {
+  AllStartedContainersAndMetaInfo,
+  startAllContainers
+} from "./containers";
 
 const GLOBAL_VARS_JSON_PATH = join(__dirname, "global.vars.json");
 const createEnv = (name: string, key: string) =>
   `__TESTCONTAINERS_${name.toUpperCase()}_${key.toUpperCase()}__`;
 
-type AllStartedContainersMetaInfo = {
-  [key: string]: StartedContainerAndMetaInfo;
-};
-async function startAllContainers(
-  config: JestTestcontainersConfig
-): Promise<AllStartedContainersMetaInfo> {
-  const containerKeys = Object.keys(config);
-  const containerConfigs = Object.values(config);
-  const startedContainersMetaInfos = await Promise.all(
-    containerConfigs.map(startContainer)
-  );
-
-  return containerKeys.reduce(
-    (acc, key, idx) => ({ ...acc, [key]: startedContainersMetaInfos[idx] }),
-    {}
-  );
-}
-
 function createGlobalVariablesFromMetaInfos(
-  metaInfos: AllStartedContainersMetaInfo
+  metaInfos: AllStartedContainersAndMetaInfo
 ) {
   const containerKeys = Object.keys(metaInfos);
 
