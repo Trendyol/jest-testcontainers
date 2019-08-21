@@ -23,3 +23,5 @@ module.exports = {
 ```
 
 See [examples/02-typescript-redis](./examples/02-typescript-redis) for a working example.
+### I have complex database setup
+If you have a complex database setup with tables/schemas that needs to be created, plugins that needs to be enabled as well; this is where this library shines more. You can create a custom docker image, and push it to docker hub or your own registry. Your own image with the configuration of database already done will be used. Which is harder to do if you use a library that spawns an in memory database.
