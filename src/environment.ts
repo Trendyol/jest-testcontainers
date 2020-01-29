@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import NodeEnvironment from "jest-environment-node";
 import { join } from "path";
-import Script = jest.Script;
+import { Script } from "vm";
 
 const GLOBAL_VARS_JSON_PATH = join(__dirname, "global.vars.json");
 
