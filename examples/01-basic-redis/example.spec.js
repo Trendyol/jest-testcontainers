@@ -13,6 +13,10 @@ describe('redis example suite', () => {
     redisClient.quit();
   });
 
+  it("should set a container name", () => {
+    expect(global.__TESTCONTAINERS_REDIS_NAME__).toBeDefined();
+  });
+
   it('should write correctly', async () => {
     // Arrange
     const setAsync = promisify(redisClient.set).bind(redisClient);

@@ -49,21 +49,34 @@ const addPortsToContainer = (ports?: number[]) => (
   return container.withExposedPorts(...ports);
 };
 
+const addNameToContainer = (name?: string) => (
+  container: GenericContainer
+): TestContainer => {
+  if (name === undefined) {
+    return container;
+  }
+  return container.withName(name);
+};
+
 export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
-  const { image, tag, ports, env, wait } = containerConfig;
-  const container: TestContainer = new GenericContainer(image, tag);
+  const { image, tag, ports, name, env, wait } = containerConfig;
+  const container = new GenericContainer(image, tag);
 
   return [
     addPortsToContainer(ports),
     addEnvironmentVariablesToContainer(env),
     addWaitStrategyToContainer(wait)
-  ].reduce((res, func) => func(res), container);
+  ].reduce<TestContainer>(
+    (res, func) => func(res),
+    addNameToContainer(name)(container)
+  );
 }
 
 export interface StartedContainerAndMetaInfo {
   ip: string;
+  name: string;
   portMappings: Map<number, number>;
   container: StartedTestContainer;
 }
@@ -77,6 +90,7 @@ export function getMetaInfo(
   return {
     container,
     ip: container.getContainerIpAddress(),
+    name: container.getName(),
     portMappings: (ports || []).reduce(
       (mapping, p: number) =>
         container.getMappedPort(p)

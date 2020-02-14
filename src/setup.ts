@@ -16,9 +16,10 @@ function createGlobalVariablesFromMetaInfos(
   const containerKeys = Object.keys(metaInfos);
 
   return containerKeys.reduce((acc: any, containerKey: string, idx: number) => {
-    const { ip, portMappings } = metaInfos[containerKey];
+    const { ip, name, portMappings } = metaInfos[containerKey];
 
     acc[createEnv(containerKey, "IP")] = ip;
+    acc[createEnv(containerKey, "NAME")] = name;
     for (const [originalPort, boundPort] of portMappings.entries()) {
       acc[createEnv(containerKey, `PORT_${originalPort}`)] = boundPort;
     }

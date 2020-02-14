@@ -33,6 +33,7 @@ module.exports = {
     image: 'neo4j',
     tag: '3.5.7',
     ports: [7687],
+    name: 'PREFIX_' + Math.floor(Math.random() * 1000),
     env: {
       NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes',
       NEO4J_AUTH: 'none',
