@@ -21,6 +21,10 @@ export interface SingleContainerConfig {
   // global.__TESTCONTAINERS_REDIS_PORT_6379__
   // set to the random host port that the currently running container is bound to for 6379
   ports?: number[];
+  // created container will have the name specified here
+  // this is introduced so you can have prefix to your containers
+  // for cleanup logic while you are using docker on docker
+  name?: string;
   // environment variables can be set for the container. this is a key/value string map 
   env?: EnvironmentVariableMap;
   // when to start your tests? how to make sure container is running?

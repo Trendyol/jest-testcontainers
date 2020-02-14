@@ -16,6 +16,7 @@ describe("config", () => {
         image: "second",
         ports: [6379, 7373],
         tag: "latest",
+        name: "name",
         wait: {
           timeout: 42,
           type: "ports"
@@ -35,6 +36,7 @@ describe("config", () => {
           image: "second",
           ports: [6379, 7373],
           tag: "latest",
+          name: "name",
           wait: {
             timeout: 42,
             type: "ports"
@@ -104,6 +106,29 @@ describe("config", () => {
       const inputs = [5353, "5353", ["asd"]].map(ports => ({
         ...baseObjInput,
         first: { ...baseObjInput.first, ports }
+      }));
+
+      // Act
+      const expectResults = inputs.map(input =>
+        expect(() => parseConfig(input))
+      );
+
+      // Assert
+      for (const expectResult of expectResults) {
+        expectResult.toThrow();
+      }
+    });
+
+    it("wrong name should throw", () => {
+      // Arrange
+      const baseObjInput = {
+        first: {
+          image: "redis"
+        }
+      };
+      const inputs = [5353, {}, []].map(name => ({
+        ...baseObjInput,
+        first: { ...baseObjInput.first, name }
       }));
 
       // Act

@@ -20,6 +20,7 @@ export interface SingleContainerConfig {
   image: string;
   tag?: string;
   ports?: number[];
+  name?: string;
   env?: EnvironmentVariableMap;
   wait?: WaitConfig;
 }
@@ -57,6 +58,7 @@ function assertContainerConfigIsValid({
   image,
   tag,
   ports,
+  name,
   wait,
   env
 }: any): void {
@@ -65,7 +67,7 @@ function assertContainerConfigIsValid({
   }
   if (
     tag !== undefined &&
-    (tag.constructor !== String || image.trim().length <= 0)
+    (tag.constructor !== String || tag.trim().length <= 0)
   ) {
     throw new JestTestcontainersConfigError(
       "tag is optional but should be string"
@@ -79,6 +81,14 @@ function assertContainerConfigIsValid({
       "ports should be a list of numbers"
     );
   }
+  if (
+    name !== undefined &&
+    (name.constructor !== String || name.trim().length <= 0)
+  ) {
+    throw new JestTestcontainersConfigError(
+      "name is optional but should be string"
+    );
+  }
   if (env !== undefined && env.constructor !== Object) {
     throw new JestTestcontainersConfigError(
       "env should be an object of env key to value"
@@ -90,8 +100,8 @@ function assertContainerConfigIsValid({
 
 function parseContainerConfig(config: any): JestTestcontainersConfig {
   assertContainerConfigIsValid(config);
-  const { image, tag, ports, env, wait } = config;
-  const parsed = { image, tag, ports, env, wait };
+  const { image, tag, ports, name, env, wait } = config;
+  const parsed = { image, tag, ports, name, env, wait };
 
   return Object.keys(parsed).reduce(
     (acc, key) => (key !== undefined ? { ...acc, [key]: config[key] } : acc),

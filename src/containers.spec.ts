@@ -78,6 +78,29 @@ describe("containers", () => {
       );
     });
 
+    it("should set name correctly", () => {
+      // Arrange
+      const config: SingleContainerConfig = {
+        image: "redis",
+        ports: [6379],
+        name: "container-name"
+      };
+
+      // Act
+      const actualContainer: any = buildTestcontainer(config);
+
+      // Assert
+      expect(actualContainer.image).toEqual("redis");
+      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.ports).toEqual([6379]);
+      expect(actualContainer.name).toEqual("container-name");
+      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.waitStrategy).toEqual(undefined);
+      expect(actualContainer.startupTimeout).toEqual(
+        new Duration(60000, TemporalUnit.MILLISECONDS)
+      );
+    });
+
     it("should set env correctly", () => {
       // Arrange
       const config: SingleContainerConfig = {
@@ -156,10 +179,13 @@ describe("containers", () => {
     it("should work with no ports", () => {
       // Arrange
       const host = "localhost";
+      const name = "container-name";
       const startedContainer: StartedTestContainer = ({
-        getContainerIpAddress: jest.fn(() => host)
+        getContainerIpAddress: jest.fn(() => host),
+        getName: jest.fn(() => name)
       } as unknown) as StartedTestContainer;
       const expectedMetaInfo: StartedContainerAndMetaInfo = {
+        name,
         container: startedContainer,
         ip: host,
         portMappings: new Map<number, number>()
@@ -175,13 +201,16 @@ describe("containers", () => {
     it("should work with empty ports", () => {
       // Arrange
       const host = "localhost";
+      const name = "container-name";
       const ports: number[] = [];
       const boundPorts = new Map<number, number>();
       const startedContainer: StartedTestContainer = ({
         getContainerIpAddress: jest.fn(() => host),
+        getName: jest.fn(() => name),
         getMappedPort: jest.fn(port => boundPorts.get(port))
       } as unknown) as StartedTestContainer;
       const expectedMetaInfo: StartedContainerAndMetaInfo = {
+        name,
         container: startedContainer,
         ip: host,
         portMappings: boundPorts
@@ -197,13 +226,19 @@ describe("containers", () => {
     it("should work with ports", () => {
       // Arrange
       const host = "localhost";
+      const name = "container-name";
       const ports = [1, 3, 4];
-      const boundPorts = new Map<number, number>([[1, 2], [3, 4]]);
+      const boundPorts = new Map<number, number>([
+        [1, 2],
+        [3, 4]
+      ]);
       const startedContainer: StartedTestContainer = ({
         getContainerIpAddress: jest.fn(() => host),
+        getName: jest.fn(() => name),
         getMappedPort: jest.fn(port => boundPorts.get(port))
       } as unknown) as StartedTestContainer;
       const expectedMetaInfo: StartedContainerAndMetaInfo = {
+        name,
         container: startedContainer,
         ip: host,
         portMappings: boundPorts
@@ -230,6 +265,7 @@ describe("containers", () => {
       const expectedMetaResult: StartedContainerAndMetaInfo = {
         container: startedContainer,
         ip: "localhost",
+        name: "container-name",
         portMappings: boundPorts
       };
       const getMetaInfoFn: any = jest.fn(() => expectedMetaResult);
@@ -266,11 +302,17 @@ describe("containers", () => {
       const rabbitPortMappings = new Map<number, number>([[3, 4]]);
       const infos: AllStartedContainersAndMetaInfo = {
         rabbit: {
+          name: "rabbit",
           container,
           ip: "localhost",
           portMappings: rabbitPortMappings
         },
-        redis: { container, ip: "localhost", portMappings: redisPortMappings }
+        redis: {
+          name: "redis",
+          container,
+          ip: "localhost",
+          portMappings: redisPortMappings
+        }
       };
       const startContainerFn: any = jest.fn(
         (cfg: SingleContainerConfig) => infos[cfg.image]
