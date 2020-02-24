@@ -1,19 +1,30 @@
 stages:
   - integration-test
 
+cache:
+  key:
+    files:
+      - package.json
+      - package-lock.json
+  paths:
+    - node_modules
+
+before_script:
+  - npm install
+
 integration-test:
   stage: integration-test
   only:
     - branches
-  image: yengas/dind-node:19.03.5-12.14.0
+  image: node:lts-slim
   variables:
+    DOCKER_HOST: "tcp://localhost:2375"
     DOCKER_TLS_CERTDIR: ""
   tags:
     - dind
   services:
     - docker:19.03.5-dind
   script:
-    - npm install
     - npm run build
     - npm run test
     - npm run example:redis
