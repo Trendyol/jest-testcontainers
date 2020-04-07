@@ -30,6 +30,9 @@ export interface SingleContainerConfig {
   // when to start your tests? how to make sure container is running?
   // see below for options
   wait?: WaitConfig;
+  // array of mounts to bind local (host's) files or directories into the container file system
+  // see below to know how to specify a bind
+  bindMounts?: BindMount[];
 }
 
 export type EnvironmentVariableMap = { [key: string]: string };
@@ -50,4 +53,19 @@ interface TextWaitConfig {
   // part of the string that will be seen on the console output line
   text: string;
 }
+
+export interface BindConfig {
+  // path to the host machine's path to bind
+  source: string;
+  // path to the guest machine (container) where it will be bound
+  target: string;
+  // whether if we grant wrant permissions
+  mode: BindMode;
+}
+
+// permissions of the bound directory / file
+// ro: readonly
+// rw: read and write
+export type BindMode = "ro" | "rw";
+
 ```

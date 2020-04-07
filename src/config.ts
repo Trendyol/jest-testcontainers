@@ -23,6 +23,7 @@ export interface SingleContainerConfig {
   name?: string;
   env?: EnvironmentVariableMap;
   wait?: WaitConfig;
+  bindMounts?: BindConfig[];
 }
 
 interface PortsWaitConfig {
@@ -34,6 +35,15 @@ interface TextWaitConfig {
   type: "text";
   text: string;
 }
+
+export interface BindConfig {
+  source: string;
+  target: string;
+  mode: BindMode;
+}
+
+// https://github.com/testcontainers/testcontainers-node/blob/v2.7.0/src/docker-client.ts#L48
+export type BindMode = "ro" | "rw";
 
 function assertWaitConfig(wait: any): void {
   if (wait === undefined) {
@@ -54,13 +64,32 @@ function assertWaitConfig(wait: any): void {
   }
 }
 
+function assertBindConfig(bindMount: any): void {
+  if (!bindMount.source) {
+    throw new JestTestcontainersConfigError(
+      "a bind is missing the source (host's) path"
+    );
+  }
+  if (!bindMount.target) {
+    throw new JestTestcontainersConfigError(
+      "a bind is missing the target (container's) path"
+    );
+  }
+  if (!bindMount.mode) {
+    throw new JestTestcontainersConfigError(
+      'a bind is missing the mode ("rw" or "ro")'
+    );
+  }
+}
+
 function assertContainerConfigIsValid({
   image,
   tag,
   ports,
   name,
   wait,
-  env
+  env,
+  bindMounts
 }: any): void {
   if (!image || image.constructor !== String || image.trim().length <= 0) {
     throw new JestTestcontainersConfigError("an image should be presented");
@@ -94,14 +123,24 @@ function assertContainerConfigIsValid({
       "env should be an object of env key to value"
     );
   }
+  if (
+    bindMounts !== undefined &&
+    (bindMounts.constructor !== Array ||
+      bindMounts.some((bindMount: any) => bindMount.constructor !== Object))
+  ) {
+    throw new JestTestcontainersConfigError(
+      "binds should be a list of bind objects"
+    );
+  }
 
   assertWaitConfig(wait);
+  if (bindMounts) bindMounts.every(assertBindConfig);
 }
 
 function parseContainerConfig(config: any): JestTestcontainersConfig {
   assertContainerConfigIsValid(config);
-  const { image, tag, ports, name, env, wait } = config;
-  const parsed = { image, tag, ports, name, env, wait };
+  const { image, tag, ports, name, env, wait, bindMounts } = config;
+  const parsed = { image, tag, ports, name, env, wait, bindMounts };
 
   return Object.keys(parsed).reduce(
     (acc, key) => (key !== undefined ? { ...acc, [key]: config[key] } : acc),
