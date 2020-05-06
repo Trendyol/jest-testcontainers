@@ -1,6 +1,11 @@
+import { StartedContainerAndMetaInfo } from "./containers";
+
 async function teardown() {
+  const allStartedContainers: StartedContainerAndMetaInfo[] = (global as any)
+    .__TESTCONTAINERS__;
+
   await Promise.all(
-    global.__TESTCONTAINERS__.map(container => container.stop())
+    allStartedContainers.map((container: any) => container.stop())
   );
 }
 
