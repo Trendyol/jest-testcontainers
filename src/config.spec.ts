@@ -20,7 +20,14 @@ describe("config", () => {
         wait: {
           timeout: 42,
           type: "ports"
-        }
+        },
+        bindMounts: [
+          {
+            source: "some path on host",
+            target: "some path on container",
+            mode: "ro"
+          }
+        ]
       };
       const objInput: any = { first: firstContainer, second: secondContainer };
       const expectedConfig: JestTestcontainersConfig = {
@@ -40,7 +47,14 @@ describe("config", () => {
           wait: {
             timeout: 42,
             type: "ports"
-          }
+          },
+          bindMounts: [
+            {
+              source: "some path on host",
+              target: "some path on container",
+              mode: "ro"
+            }
+          ]
         }
       };
 
@@ -182,6 +196,60 @@ describe("config", () => {
       ].map(wait => ({
         ...baseObjInput,
         first: { ...baseObjInput.first, wait }
+      }));
+
+      // Act
+      const expectResults = inputs.map(input =>
+        expect(() => parseConfig(input))
+      );
+
+      // Assert
+      for (const expectResult of expectResults) {
+        expectResult.toThrow();
+      }
+    });
+
+    it("wrong bind mounts should throw", () => {
+      // Arrange
+      const baseObjInput = {
+        first: {
+          image: "redis"
+        }
+      };
+      const inputs = [
+        null,
+        42,
+        "a weird string mount, like something:somevalue",
+        {
+          source: "a bind mount out of an array",
+          target: "a bind mount out of an array",
+          mode: "rw"
+        },
+        ["an array of non-object bind mounts"],
+        [
+          {
+            source: "a bind mount with just source path"
+          }
+        ],
+        [
+          {
+            target: "a bind mount with just target path"
+          }
+        ],
+        [
+          {
+            mode: "a bind mount with just mode"
+          }
+        ],
+        [
+          {
+            source: "a bind mount with just source and target paths",
+            target: "a bind mount with just source and target paths"
+          }
+        ]
+      ].map(bindMounts => ({
+        ...baseObjInput,
+        first: { ...baseObjInput.first, bindMounts }
       }));
 
       // Act

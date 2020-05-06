@@ -34,6 +34,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should set tag correctly", () => {
@@ -55,6 +56,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should set ports correctly", () => {
@@ -76,6 +78,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should set name correctly", () => {
@@ -99,6 +102,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should set env correctly", () => {
@@ -122,6 +126,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should port wait strategy correctly", () => {
@@ -146,6 +151,7 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(30, TemporalUnit.SECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
     });
 
     it("should text wait strategy correctly", () => {
@@ -172,6 +178,50 @@ describe("containers", () => {
       expect(actualContainer.startupTimeout).toEqual(
         new Duration(60000, TemporalUnit.MILLISECONDS)
       );
+      expect(actualContainer.bindMounts).toEqual([]);
+    });
+    it("should set bind mounts correctly", () => {
+      // Arrange
+      const config: SingleContainerConfig = {
+        image: "redis",
+        bindMounts: [
+          {
+            source: "/somepath",
+            target: "/somepath",
+            mode: "ro"
+          },
+          {
+            source: "/anotherpath",
+            target: "/anotherpath",
+            mode: "ro"
+          }
+        ]
+      };
+
+      // Act
+      const actualContainer: any = buildTestcontainer(config);
+
+      // Assert
+      expect(actualContainer.image).toEqual("redis");
+      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.ports).toEqual([]);
+      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.waitStrategy).toEqual(undefined);
+      expect(actualContainer.startupTimeout).toEqual(
+        new Duration(60000, TemporalUnit.MILLISECONDS)
+      );
+      expect(actualContainer.bindMounts).toEqual([
+        {
+          source: "/somepath",
+          target: "/somepath",
+          bindMode: "ro"
+        },
+        {
+          source: "/anotherpath",
+          target: "/anotherpath",
+          bindMode: "ro"
+        }
+      ]);
     });
   });
 

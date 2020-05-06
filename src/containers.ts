@@ -8,7 +8,8 @@ import {
   EnvironmentVariableMap,
   JestTestcontainersConfig,
   SingleContainerConfig,
-  WaitConfig
+  WaitConfig,
+  BindConfig
 } from "./config";
 
 const addWaitStrategyToContainer = (waitStrategy?: WaitConfig) => (
@@ -49,6 +50,17 @@ const addPortsToContainer = (ports?: number[]) => (
   return container.withExposedPorts(...ports);
 };
 
+const addBindsToContainer = (bindMounts?: BindConfig[]) => (
+  container: TestContainer
+): TestContainer => {
+  if (!bindMounts) return container;
+
+  for (const bindMount of bindMounts) {
+    container.withBindMount(bindMount.source, bindMount.target, bindMount.mode);
+  }
+  return container;
+};
+
 const addNameToContainer = (name?: string) => (
   container: GenericContainer
 ): TestContainer => {
@@ -61,13 +73,14 @@ const addNameToContainer = (name?: string) => (
 export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
-  const { image, tag, ports, name, env, wait } = containerConfig;
+  const { image, tag, ports, name, env, wait, bindMounts } = containerConfig;
   const container = new GenericContainer(image, tag);
 
   return [
     addPortsToContainer(ports),
     addEnvironmentVariablesToContainer(env),
-    addWaitStrategyToContainer(wait)
+    addWaitStrategyToContainer(wait),
+    addBindsToContainer(bindMounts)
   ].reduce<TestContainer>(
     (res, func) => func(res),
     addNameToContainer(name)(container)
