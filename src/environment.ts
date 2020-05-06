@@ -31,7 +31,7 @@ export class TestcontainersEnvironment extends NodeEnvironment {
     await super.teardown();
   }
 
-  public runScript(script: Script) {
+  public runScript<T = unknown>(script: Script): T | null {
     return super.runScript(script);
   }
 }

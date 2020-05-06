@@ -8,8 +8,8 @@ describe("teardown", () => {
       const mocks = [...new Array(5)].map(() => ({
         stop: jest.fn(() => Promise.resolve())
       }));
-      // @ts-ignore
-      global[CONTAINERS_GLOBAL_VARIABLE_KEY] = mocks;
+
+      (global as any)[CONTAINERS_GLOBAL_VARIABLE_KEY] = mocks;
 
       // Act
       await teardown();
