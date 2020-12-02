@@ -1,7 +1,10 @@
 import { StartedContainerAndMetaInfo } from "./containers";
 
 async function teardown(opts: any) {
-  if (opts.watch || opts.watchAll) {
+  if (
+    !process.env.JEST_TESTCONTAINERS_RESTART_ON_WATCH &&
+    (opts.watch || opts.watchAll)
+  ) {
     return;
   }
 

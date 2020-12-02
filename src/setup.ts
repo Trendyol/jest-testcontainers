@@ -29,7 +29,11 @@ function createGlobalVariablesFromMetaInfos(
 }
 
 async function setup(opts: any) {
-  if ((opts.watch || opts.watchAll) && global.__TESTCONTAINERS__) {
+  if (
+    !process.env.JEST_TESTCONTAINERS_RESTART_ON_WATCH &&
+    (opts.watch || opts.watchAll) &&
+    global.__TESTCONTAINERS__
+  ) {
     return;
   }
 
