@@ -28,7 +28,11 @@ function createGlobalVariablesFromMetaInfos(
   }, {});
 }
 
-async function setup() {
+async function setup(opts: any) {
+  if ((opts.watch || opts.watchAll) && global.__TESTCONTAINERS__) {
+    return;
+  }
+
   const jestTestcontainersConfig = configReader();
   const allStartedContainersMetaInfo = await startAllContainers(
     jestTestcontainersConfig

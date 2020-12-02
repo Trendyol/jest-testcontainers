@@ -1,6 +1,10 @@
 import { StartedContainerAndMetaInfo } from "./containers";
 
-async function teardown() {
+async function teardown(opts: any) {
+  if (opts.watch || opts.watchAll) {
+    return;
+  }
+
   const allStartedContainers: StartedContainerAndMetaInfo[] = (global as any)
     .__TESTCONTAINERS__;
 
