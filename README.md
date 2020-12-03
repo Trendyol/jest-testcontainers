@@ -26,23 +26,20 @@ Create a file called `jest-testcontainers-config.js` and put it to root of your 
 module.exports = {
   redis: {
     image: 'redis',
+    tag: 'alpine3.12',
     ports: [6379],
-  },
-  neo4j: { 
-    // can put custom images as well
-    image: 'neo4j',
-    tag: '3.5.7',
-    ports: [7687],
-    name: 'PREFIX_' + Math.floor(Math.random() * 1000),
     env: {
-      NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes',
-      NEO4J_AUTH: 'none',
+      EXAMPLE: 'env',
     },
     wait: {
-        type: 'text',
-        text: 'Remote interface available at',
-    },
+      type: 'text',
+      text: 'Ready to accept connections'
+    }
   },
+//   more: {
+//     image: 'any-docker-image', // postgresql, mongodb, neo4j etc.
+//     ports: [1234, 4567], // ports to make accessible in tests
+//   },
 };
 ```
 
@@ -52,15 +49,16 @@ Every containers IP and Port info is registered to global variables to be used b
 const redis = require('redis');
 const { promisify } = require('util');
 
-describe('redis example suite', () => {
+describe('testcontainers example suite', () => {
   let redisClient;
 
   beforeAll(() => {
     const redisConnectionURI = `redis://${global.__TESTCONTAINERS_REDIS_IP__}:${global.__TESTCONTAINERS_REDIS_PORT_6379__}`;
     redisClient = redis.createClient(redisConnectionURI);
     
-    // const neo4jConnectionURI = `bolt://${global.__TESTCONTAINERS_NEO4J_IP__}:${global.__TESTCONTAINERS_NEO4J_PORT_7687__}`;
-    // use the neo4j connection uri to create a client
+    // if you have declared multiple containers, they will be available to access as well. e.g.
+    // `global.__TESTCONTAINERS_${CONFIG_KEY}_IP__`
+    // `global.__TESTCONTAINERS_${CONFIG_KEY}_PORT_${CONFIG_PORT}__`
   });
 
   afterAll(() => {
