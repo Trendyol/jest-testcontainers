@@ -83,6 +83,13 @@ describe('redis example suite', () => {
 ## Documentation
 Detailed documentation of the `jest-testcontainers-config.js` can be found at [DOC.md](./DOC.md).
 
+## Watch mode support
+Starting with version 2.0.0 containers will not be stopped if Jest is started in watch mode. This greatly improves development productivity if your containers have a slow startup time (ex. Elasticsearch). This comes with the price that you have to be mindful that containers will be reused between watch test executions and you need to do proper cleanup in your after hooks.
+
+If you want to disable this behavior you can set the `JEST_TESTCONTAINERS_RESTART_ON_WATCH` environment variable.
+
+> Wondering what will happen when those containers are not stopped when Jest is exited - [testcontainer's ryuk](https://github.com/testcontainers/testcontainers-node#ryuk) will take care of them.
+
 ## Examples
 Working example projects can be found and tried out in [examples](./examples) folder. To run the redis only example, you can clone this project, and run `npm run build && npm run example:redis` at the root folder. It will first build the project with the latest code, and then run the example.
 
