@@ -81,15 +81,17 @@ describe('testcontainers example suite', () => {
 ## Documentation
 Detailed documentation of the `jest-testcontainers-config.js` can be found at [DOC.md](./DOC.md).
 
+## Examples
+- [examples/01-basic-redis](examples/01-basic-redis) showcases writing integration tests against Redis. You can use `npm run build && npm run example:redis` command to run this example locally.
+- [examples/02-typescript-redis](examples/02-typescript-redis) same test cases as in example #1. However using Typescript instead of JavaScript. You can use `npm run build && npm run example:redis-typescript` to run this example locally.
+- [Yengas/nodejs-postgresql-testcontainers](https://github.com/Yengas/nodejs-postgresql-testcontainers) showcases writing integration tests against PostgreSQL with schema migration and Typescript. You can check out the project page for more details.
+
 ## Watch mode support
 Starting with version 2.0.0 containers will not be stopped if Jest is started in watch mode. This greatly improves development productivity if your containers have a slow startup time (ex. Elasticsearch). This comes with the price that you have to be mindful that containers will be reused between watch test executions and you need to do proper cleanup in your after hooks.
 
 If you want to disable this behavior you can set the `JEST_TESTCONTAINERS_RESTART_ON_WATCH` environment variable.
 
 > Wondering what will happen when those containers are not stopped when Jest is exited - [testcontainer's ryuk](https://github.com/testcontainers/testcontainers-node#ryuk) will take care of them.
-
-## Examples
-Working example projects can be found and tried out in [examples](./examples) folder. To run the redis only example, you can clone this project, and run `npm run build && npm run example:redis` at the root folder. It will first build the project with the latest code, and then run the example.
 
 ## License
 This project is licensed under the MIT License
