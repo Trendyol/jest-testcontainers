@@ -65,6 +65,54 @@ describe("config", () => {
       expect(actualConfig).toEqual(expectedConfig);
     });
 
+    it("should parse to docker compose options correctly", () => {
+      // Arrange
+      const objInput: any = {
+        dockerCompose: {
+          composeFilePath: ".",
+          composeFile: "docker-compose.yml",
+          startupTimeout: 1000
+        }
+      };
+      const expectedConfig: JestTestcontainersConfig = {
+        dockerCompose: {
+          composeFilePath: ".",
+          composeFile: "docker-compose.yml",
+          startupTimeout: 1000
+        }
+      };
+
+      // Act
+      const actualConfig = parseConfig(objInput);
+
+      // Assert
+      expect(actualConfig).toEqual(expectedConfig);
+    });
+
+    it("should throw when trying to combine dockerCompose with other options", () => {
+      // Arrange
+      const objInput: any = {
+        dockerCompose: {
+          composeFilePath: ".",
+          composeFile: "docker-compose.yml",
+          startupTimeout: 1000
+        },
+        first: {
+          image: "first",
+          wait: {
+            text: "hello",
+            type: "text"
+          }
+        }
+      };
+
+      // Act
+      const expectResult = expect(() => parseConfig(objInput));
+
+      // Assert
+      expectResult.toThrow();
+    });
+
     it("empty config should throw", () => {
       // Arrange
       const objInput: any = {};

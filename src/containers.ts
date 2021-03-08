@@ -1,10 +1,16 @@
 import { Duration, TemporalUnit } from "node-duration";
-import { GenericContainer, Wait } from "testcontainers";
+import {
+  DockerComposeEnvironment,
+  GenericContainer,
+  Wait
+} from "testcontainers";
 import {
   StartedTestContainer,
   TestContainer
 } from "testcontainers/dist/test-container";
+import { StartedGenericContainer } from "testcontainers/dist/generic-container";
 import {
+  DockerComposeConfig,
   EnvironmentVariableMap,
   JestTestcontainersConfig,
   SingleContainerConfig,
@@ -87,6 +93,24 @@ export function buildTestcontainer(
   );
 }
 
+export function buildDockerComposeEnvironment(
+  dockerComposeConfig: DockerComposeConfig
+): DockerComposeEnvironment {
+  const environment = new DockerComposeEnvironment(
+    dockerComposeConfig.composeFilePath,
+    dockerComposeConfig.composeFile
+  );
+  if (dockerComposeConfig?.startupTimeout) {
+    return environment.withStartupTimeout(
+      new Duration(
+        dockerComposeConfig.startupTimeout,
+        TemporalUnit.MILLISECONDS
+      )
+    );
+  }
+  return environment;
+}
+
 export interface StartedContainerAndMetaInfo {
   ip: string;
   name: string;
@@ -125,13 +149,39 @@ export async function startContainer(
   return infoGetterFn(startedContainer, containerConfig.ports);
 }
 
+export async function startDockerComposeContainers(
+  dockerComposeConfig: DockerComposeConfig,
+  dockerComposeBuilderFn: typeof buildDockerComposeEnvironment = buildDockerComposeEnvironment,
+  infoGetterFn: typeof getMetaInfo = getMetaInfo
+): Promise<AllStartedContainersAndMetaInfo> {
+  const environment = dockerComposeBuilderFn(dockerComposeConfig);
+  const startedEnvironment = await environment.up();
+  // This is a private property, so the only way to access it is to ignore the
+  // typescript compilation error.
+  // @ts-ignore
+  const containers = startedEnvironment.startedGenericContainers;
+  return Object.keys(containers).reduce(
+    (acc, containerName) => ({
+      ...acc,
+      [containerName]: infoGetterFn(containers[containerName])
+    }),
+    {}
+  );
+}
+
 export type AllStartedContainersAndMetaInfo = {
   [key: string]: StartedContainerAndMetaInfo;
 };
 export async function startAllContainers(
   config: JestTestcontainersConfig,
-  startContainerFn: typeof startContainer = startContainer
+  startContainerFn: typeof startContainer = startContainer,
+  startDockerComposeContainersFn: typeof startDockerComposeContainers = startDockerComposeContainers
 ): Promise<AllStartedContainersAndMetaInfo> {
+  if ("dockerCompose" in config) {
+    return startDockerComposeContainersFn(
+      config.dockerCompose as DockerComposeConfig
+    );
+  }
   const containerKeys = Object.keys(config);
   const containerConfigs = Object.values(config);
   const startedContainersMetaInfos = await Promise.all(
