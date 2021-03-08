@@ -2,15 +2,29 @@
 
 ## Container Configuration
 ```js
-// you can have multiple containers that gets started with your test
-export interface JestTestcontainersConfig {
+// You can either build containers using docker compose OR set up multiple images
+// using SingleContainerConfig, but not both
+export type JestTestcontainersConfig =
+  | DockerComposeContainersConfig
+  | MultipleContainerConfig;
+
+export type DockerComposeConfig = {
+  // The directory where the compose file is located
+  composeFilePath: string;
+  // The actual docker compose file to be built
+  composeFile: string;
+  startupTimeout?: number;
+}
+
+// you can have multiple containers that get started with your test
+type MultipleContainerConfig = {
   // each container needs to have a unique key
   // the IP and PORTS for this container will be registered with this container key
   // for example, with a *containerKey* of redis, you would end up with
   // global.__TESTCONTAINERS_REDIS_IP__ and global.__TESTCONTAINERS_REDIS_PORT_XXXX__
   // variables
-  [containerKey: string]: SingleContainerConfig;
-}
+  [key: string]: SingleContainerConfig;
+};
 
 export interface SingleContainerConfig {
   image: string;
