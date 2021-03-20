@@ -8,7 +8,6 @@ import {
   StartedTestContainer,
   TestContainer
 } from "testcontainers/dist/test-container";
-import { StartedGenericContainer } from "testcontainers/dist/generic-container";
 import {
   DockerComposeConfig,
   EnvironmentVariableMap,
