@@ -4,3 +4,4 @@ script:
   - npm run build
   - npm run example:redis
   - npm run example:redis-typescript
+  - npm run example:docker-compose
