@@ -162,7 +162,10 @@ export async function startDockerComposeContainers(
   return Object.keys(containers).reduce(
     (acc, containerName) => ({
       ...acc,
-      [containerName]: infoGetterFn(containers[containerName])
+      [containerName]: infoGetterFn(
+        containers[containerName],
+        Array.from(containers[containerName].boundPorts.ports.keys())
+      )
     }),
     {}
   );

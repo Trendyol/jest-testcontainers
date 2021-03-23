@@ -393,7 +393,10 @@ describe("containers", () => {
       const ports = [1];
       const boundPorts = new Map<number, number>([[1, 2]]);
       const startedContainer = ({
-        containerName: "container-name"
+        containerName: "container-name",
+        boundPorts: {
+          ports: boundPorts
+        }
       } as unknown) as StartedTestContainer;
       const containerMeta: StartedContainerAndMetaInfo = {
         container: startedContainer,
@@ -430,7 +433,7 @@ describe("containers", () => {
 
       // Assert
       expect(actualMetaResult).toEqual(expectedMetaResult);
-      expect(getMetaInfoFn).toHaveBeenCalledWith(startedContainer);
+      expect(getMetaInfoFn).toHaveBeenCalledWith(startedContainer, ports);
       expect(environment.up).toHaveBeenCalledWith();
       expect(dockerComposeBuilderFn).toHaveBeenCalledWith(dockerComposeConfig);
     });
