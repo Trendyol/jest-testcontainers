@@ -17,7 +17,8 @@
     "style:fix": "npm run lint && npm run prettier",
     "prepublish": "npm run build",
     "example:redis": "cd ./examples/01-basic-redis && jest",
-    "example:redis-typescript": "cd ./examples/02-typescript-redis && jest"
+    "example:redis-typescript": "cd ./examples/02-typescript-redis && jest",
+    "example:docker-compose": "cd ./examples/03-docker-compose && jest"
   },
   "lint-staged": {
     "*.ts": [
