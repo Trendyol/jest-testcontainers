@@ -84,6 +84,7 @@ Detailed documentation of the `jest-testcontainers-config.js` can be found at [D
 ## Examples
 - [examples/01-basic-redis](examples/01-basic-redis) showcases writing integration tests against Redis. You can use `npm run build && npm run example:redis` command to run this example locally.
 - [examples/02-typescript-redis](examples/02-typescript-redis) same test cases as in example #1. However using Typescript instead of JavaScript. You can use `npm run build && npm run example:redis-typescript` to run this example locally.
+- [examples/03-docker-compose](examples/03-docker-compose) same test cases as examples #1 and #2, however using Docker Compose to build the container. You can use `npm run build && npm run example:docker-compose` to run this example locally.
 - [Yengas/nodejs-postgresql-testcontainers](https://github.com/Yengas/nodejs-postgresql-testcontainers) showcases writing integration tests against PostgreSQL with schema migration and Typescript. You can check out the project page for more details.
 
 ## Watch mode support
