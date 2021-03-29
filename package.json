@@ -1,6 +1,6 @@
 {
   "name": "@trendyol/jest-testcontainers",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Jest preset for starting docker containers that stay up whilist your tests run.",
   "main": "dist/index",
   "types": "dist/index",
