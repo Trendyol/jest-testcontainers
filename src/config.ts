@@ -12,9 +12,23 @@ class JestTestcontainersConfigError extends Error {
 export type EnvironmentVariableMap = { [key: string]: string };
 export type WaitConfig = PortsWaitConfig | TextWaitConfig;
 
-export interface JestTestcontainersConfig {
+export type DockerComposeConfig = {
+  composeFilePath: string;
+  composeFile: string;
+  startupTimeout?: number;
+};
+
+type DockerComposeContainersConfig = {
+  dockerCompose?: DockerComposeConfig;
+};
+
+type MultipleContainerConfig = {
   [key: string]: SingleContainerConfig;
-}
+};
+
+export type JestTestcontainersConfig =
+  | DockerComposeContainersConfig
+  | MultipleContainerConfig;
 
 export interface SingleContainerConfig {
   image: string;
@@ -184,6 +198,15 @@ export function parseConfig(containerConfigs: any) {
     throw new JestTestcontainersConfigError(
       "testcontainers config can not be empty"
     );
+  }
+
+  if ("dockerCompose" in containerConfigs) {
+    if (Object.keys(containerConfigs).length !== 1) {
+      throw new JestTestcontainersConfigError(
+        "testcontainers config cannot contain other images when using 'dockerCompose' option"
+      );
+    }
+    return containerConfigs;
   }
 
   return Object.keys(containerConfigs).reduce(

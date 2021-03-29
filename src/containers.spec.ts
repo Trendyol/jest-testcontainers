@@ -1,16 +1,22 @@
 import { Duration, TemporalUnit } from "node-duration";
-import { Wait } from "testcontainers";
+import { DockerComposeEnvironment, Wait } from "testcontainers";
 import {
   StartedTestContainer,
   TestContainer
 } from "testcontainers/dist/test-container";
-import { JestTestcontainersConfig, SingleContainerConfig } from "./config";
+import {
+  DockerComposeConfig,
+  JestTestcontainersConfig,
+  SingleContainerConfig
+} from "./config";
 import {
   AllStartedContainersAndMetaInfo,
+  buildDockerComposeEnvironment,
   buildTestcontainer,
   getMetaInfo,
   startAllContainers,
   startContainer,
+  startDockerComposeContainers,
   StartedContainerAndMetaInfo
 } from "./containers";
 
@@ -225,6 +231,47 @@ describe("containers", () => {
     });
   });
 
+  describe("buildDockerComposeEnvironment", () => {
+    it("should create simple docker compose environment", () => {
+      // Arrange
+      const dockerComposeConfig: DockerComposeConfig = {
+        composeFilePath: ".",
+        composeFile: "docker-compose.yml"
+      };
+      const nameRegex = new RegExp(/testcontainers-[0-9A-F]{32}/i);
+
+      // Act
+      const actualEnvironment: any = buildDockerComposeEnvironment(
+        dockerComposeConfig
+      );
+
+      // Assert
+      expect(actualEnvironment.projectName).toEqual(
+        expect.stringMatching(nameRegex)
+      );
+    });
+
+    it("should set startup timeout correctly", () => {
+      // Arrange
+      const dockerComposeConfig: DockerComposeConfig = {
+        composeFilePath: ".",
+        composeFile: "docker-compose.yml",
+        startupTimeout: 60000
+      };
+      const nameRegex = new RegExp(/testcontainers-[0-9A-F]{32}/i);
+
+      // Act
+      const actualEnvironment: any = buildDockerComposeEnvironment(
+        dockerComposeConfig
+      );
+
+      // Assert
+      expect(actualEnvironment.startupTimeout).toEqual(
+        new Duration(60000, TemporalUnit.MILLISECONDS)
+      );
+    });
+  });
+
   describe("getMetaInfo", () => {
     it("should work with no ports", () => {
       // Arrange
@@ -340,6 +387,58 @@ describe("containers", () => {
     });
   });
 
+  describe("startDockerComposeContainers", () => {
+    it("should call builder and getter functions", async () => {
+      // Arrange
+      const ports = [1];
+      const boundPorts = new Map<number, number>([[1, 2]]);
+      const startedContainer = ({
+        containerName: "container-name",
+        boundPorts: {
+          ports: boundPorts
+        }
+      } as unknown) as StartedTestContainer;
+      const containerMeta: StartedContainerAndMetaInfo = {
+        container: startedContainer,
+        ip: "localhost",
+        name: "container-name",
+        portMappings: boundPorts
+      };
+      const environment: DockerComposeEnvironment = ({
+        up: jest.fn(() =>
+          Promise.resolve({
+            startedGenericContainers: {
+              "container-name": startedContainer
+            }
+          })
+        )
+      } as unknown) as DockerComposeEnvironment;
+      const dockerComposeBuilderFn: any = jest.fn(() => environment);
+      const expectedMetaResult: AllStartedContainersAndMetaInfo = {
+        "container-name": containerMeta
+      };
+      const getMetaInfoFn: any = jest.fn(() => containerMeta);
+      const dockerComposeConfig: DockerComposeConfig = {
+        composeFilePath: ".",
+        composeFile: "docker-compose.yml",
+        startupTimeout: 1000
+      };
+
+      // Act
+      const actualMetaResult = await startDockerComposeContainers(
+        dockerComposeConfig,
+        dockerComposeBuilderFn,
+        getMetaInfoFn
+      );
+
+      // Assert
+      expect(actualMetaResult).toEqual(expectedMetaResult);
+      expect(getMetaInfoFn).toHaveBeenCalledWith(startedContainer, ports);
+      expect(environment.up).toHaveBeenCalledWith();
+      expect(dockerComposeBuilderFn).toHaveBeenCalledWith(dockerComposeConfig);
+    });
+  });
+
   describe("startAllContainers", () => {
     it("should call starter function", async () => {
       // Arrange
@@ -378,6 +477,41 @@ describe("containers", () => {
       expect(allStartedContainerAndMetaInfo).toEqual(infos);
       expect(startContainerFn).toHaveBeenCalledWith(config.rabbit);
       expect(startContainerFn).toHaveBeenCalledWith(config.redis);
+    });
+
+    it("should call docker compose starter function", async () => {
+      // Arrange
+      const config: JestTestcontainersConfig = {
+        dockerCompose: {
+          composeFilePath: ".",
+          composeFile: "docker-compose.yml"
+        }
+      };
+      const container = (null as unknown) as StartedTestContainer;
+      const redisPortMappings = new Map<number, number>([[1, 2]]);
+      const infos: AllStartedContainersAndMetaInfo = {
+        redis: {
+          name: "redis",
+          container,
+          ip: "localhost",
+          portMappings: redisPortMappings
+        }
+      };
+      const startContainerFn: any = jest.fn();
+      const startDockerComposeContainersFn: any = jest.fn(() => infos);
+
+      // Act
+      const allStartedContainerAndMetaInfo = await startAllContainers(
+        config,
+        startContainerFn,
+        startDockerComposeContainersFn
+      );
+
+      // Assert
+      expect(allStartedContainerAndMetaInfo).toEqual(infos);
+      expect(startDockerComposeContainersFn).toHaveBeenCalledWith(
+        config.dockerCompose
+      );
     });
   });
 });
