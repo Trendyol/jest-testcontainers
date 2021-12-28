@@ -32,6 +32,7 @@ export class TestcontainersEnvironment extends NodeEnvironment {
   }
 
   public runScript<T = any>(script: Script): T | null {
+    // @ts-ignore
     return super.runScript(script);
   }
 }

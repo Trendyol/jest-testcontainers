@@ -32,6 +32,7 @@ async function setup(opts: any) {
   if (
     !process.env.JEST_TESTCONTAINERS_RESTART_ON_WATCH &&
     (opts.watch || opts.watchAll) &&
+    // @ts-ignore
     global.__TESTCONTAINERS__
   ) {
     return;
@@ -46,6 +47,7 @@ async function setup(opts: any) {
   );
 
   writeFileSync(GLOBAL_VARS_JSON_PATH, JSON.stringify(globalEnv), "utf-8");
+  // @ts-ignore
   global.__TESTCONTAINERS__ = Object.values(allStartedContainersMetaInfo).map(
     ({ container }) => container
   ) as GlobalStartedTestContainer[];
