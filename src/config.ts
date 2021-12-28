@@ -177,6 +177,7 @@ function readJsFile(file: string): any {
     return require(file);
   } catch (e) {
     throw new JestTestcontainersConfigError(
+      // @ts-ignore
       `could not read file ${file} as js file: ${e.message}`
     );
   }
