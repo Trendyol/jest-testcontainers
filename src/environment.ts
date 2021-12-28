@@ -16,8 +16,9 @@ export function setGlobalsWithJsonString(globals: any, jsonString: string) {
 }
 
 export class TestcontainersEnvironment extends NodeEnvironment {
-  constructor(config: any) {
-    super(config);
+  constructor(config: any, context: any) {
+    // @ts-ignore
+    super(config, context);
   }
 
   public async setup() {

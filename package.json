@@ -9,8 +9,8 @@
     "jest-preset.js"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && tsc",
+    "remove:dist": "rm -rf dist",
+    "build": "npm run remove:dist && tsc",
     "test": "jest",
     "lint": "tslint --fix src/**/*.ts",
     "prettier": "prettier --write src/**/*.ts",
