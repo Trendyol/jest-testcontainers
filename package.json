@@ -69,7 +69,7 @@
   "dependencies": {
     "cwd": "^0.10.0",
     "node-duration": "^1.0.4",
-    "testcontainers": "4.7.0"
+    "testcontainers": "8.4.0"
   },
   "peerDependencies": {
     "jest-environment-node": ">=25"
