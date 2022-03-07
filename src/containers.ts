@@ -24,9 +24,7 @@ const addWaitStrategyToContainer = (waitStrategy?: WaitConfig) => (
     return container;
   }
   if (waitStrategy.type === "ports") {
-    return container.withStartupTimeout(
-      new Duration(waitStrategy.timeout, TemporalUnit.SECONDS)
-    );
+    return container.withStartupTimeout(waitStrategy.timeout);
   }
   if (waitStrategy.type === "text") {
     return container.withWaitStrategy(Wait.forLogMessage(waitStrategy.text));
@@ -79,7 +77,7 @@ export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
   const { image, tag, ports, name, env, wait, bindMounts } = containerConfig;
-  const container = new GenericContainer(image, tag);
+  const container = new GenericContainer(image);
 
   return [
     addPortsToContainer(ports),
@@ -100,12 +98,7 @@ export function buildDockerComposeEnvironment(
     dockerComposeConfig.composeFile
   );
   if (dockerComposeConfig?.startupTimeout) {
-    return environment.withStartupTimeout(
-      new Duration(
-        dockerComposeConfig.startupTimeout,
-        TemporalUnit.MILLISECONDS
-      )
-    );
+    return environment.withStartupTimeout(dockerComposeConfig.startupTimeout);
   }
   return environment;
 }
@@ -125,7 +118,7 @@ export function getMetaInfo(
 
   return {
     container,
-    ip: container.getContainerIpAddress(),
+    ip: container.getHost(),
     name: container.getName(),
     portMappings: (ports || []).reduce(
       (mapping, p: number) =>
