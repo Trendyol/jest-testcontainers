@@ -39,6 +39,7 @@ module.exports = {
 //   more: {
 //     image: 'any-docker-image', // postgresql, mongodb, neo4j etc.
 //     ports: [1234, 4567], // ports to make accessible in tests
+//     cmd: ['echo', '"hi"']
 //   },
 };
 ```
