@@ -2,7 +2,7 @@ name: Test Jest-Containers
 on: push
 
 jobs:
-  build:
+  test_and_publish:
     runs-on: ubuntu-latest 
     permissions: 
       contents: read
@@ -14,8 +14,14 @@ jobs:
           node-version: 'lts/gallium'
           cache: 'npm'
           cache-dependency-path: package-lock.json
+          registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
       - run: npm run test
       - run: npm run example:redis
       - run: npm run example:redis-typescript
+      - name: Publish NPM package publish
+        if: ${{ github.ref == 'ref/heads/main' }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

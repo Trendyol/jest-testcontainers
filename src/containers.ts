@@ -1,4 +1,3 @@
-import { Duration, TemporalUnit } from "node-duration";
 import {
   DockerComposeEnvironment,
   GenericContainer,
