@@ -32,14 +32,11 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -54,14 +51,11 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("5.0.5");
+      expect(actualContainer.image).toEqual("redis:5.0.5");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -76,14 +70,11 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([6379]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -99,15 +90,12 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([6379]);
       expect(actualContainer.name).toEqual("container-name");
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -124,14 +112,11 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({ hello: "world" });
+      expect(actualContainer.environment).toEqual({ hello: "world" });
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -149,14 +134,11 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(30, TemporalUnit.SECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(30000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
 
@@ -174,16 +156,13 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(
         Wait.forLogMessage("hello, world")
       );
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([]);
     });
     it("should set bind mounts correctly", () => {
@@ -192,9 +171,9 @@ describe("containers", () => {
         image: "redis",
         bindMounts: [
           {
+            mode: "ro",
             source: "/somepath",
-            target: "/somepath",
-            mode: "ro"
+            target: "/somepath"
           },
           {
             source: "/anotherpath",
@@ -208,24 +187,21 @@ describe("containers", () => {
       const actualContainer: any = buildTestcontainer(config);
 
       // Assert
-      expect(actualContainer.image).toEqual("redis");
-      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.image).toEqual("redis:latest");
       expect(actualContainer.ports).toEqual([]);
-      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.environment).toEqual({});
       expect(actualContainer.waitStrategy).toEqual(undefined);
-      expect(actualContainer.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualContainer.startupTimeout).toEqual(60000);
       expect(actualContainer.bindMounts).toEqual([
         {
+          mode: "ro",
           source: "/somepath",
-          target: "/somepath",
-          bindMode: "ro"
+          target: "/somepath"
         },
         {
           source: "/anotherpath",
           target: "/anotherpath",
-          bindMode: "ro"
+          mode: "ro"
         }
       ]);
     });
@@ -266,9 +242,7 @@ describe("containers", () => {
       );
 
       // Assert
-      expect(actualEnvironment.startupTimeout).toEqual(
-        new Duration(60000, TemporalUnit.MILLISECONDS)
-      );
+      expect(actualEnvironment.startupTimeout).toEqual(60000);
     });
   });
 
@@ -278,7 +252,7 @@ describe("containers", () => {
       const host = "localhost";
       const name = "container-name";
       const startedContainer: StartedTestContainer = ({
-        getContainerIpAddress: jest.fn(() => host),
+        getHost: jest.fn(() => host),
         getName: jest.fn(() => name)
       } as unknown) as StartedTestContainer;
       const expectedMetaInfo: StartedContainerAndMetaInfo = {
@@ -302,7 +276,7 @@ describe("containers", () => {
       const ports: number[] = [];
       const boundPorts = new Map<number, number>();
       const startedContainer: StartedTestContainer = ({
-        getContainerIpAddress: jest.fn(() => host),
+        getHost: jest.fn(() => host),
         getName: jest.fn(() => name),
         getMappedPort: jest.fn(port => boundPorts.get(port))
       } as unknown) as StartedTestContainer;
@@ -330,7 +304,7 @@ describe("containers", () => {
         [3, 4]
       ]);
       const startedContainer: StartedTestContainer = ({
-        getContainerIpAddress: jest.fn(() => host),
+        getHost: jest.fn(() => host),
         getName: jest.fn(() => name),
         getMappedPort: jest.fn(port => boundPorts.get(port))
       } as unknown) as StartedTestContainer;

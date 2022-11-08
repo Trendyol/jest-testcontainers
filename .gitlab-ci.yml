@@ -16,7 +16,7 @@ integration-test:
   stage: integration-test
   only:
     - branches
-  image: node:lts-slim
+  image: node:lts-gallium
   variables:
     DOCKER_HOST: "tcp://localhost:2375"
     DOCKER_TLS_CERTDIR: ""

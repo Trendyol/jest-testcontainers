@@ -1,6 +1,6 @@
 {
   "name": "@trendyol/jest-testcontainers",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Jest preset for starting docker containers that stay up whilist your tests run.",
   "main": "dist/index",
   "types": "dist/index",
@@ -69,7 +69,7 @@
   "dependencies": {
     "cwd": "^0.10.0",
     "node-duration": "^1.0.4",
-    "testcontainers": "4.7.0"
+    "testcontainers": "9.0.0"
   },
   "peerDependencies": {
     "jest-environment-node": ">=25"
