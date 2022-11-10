@@ -1,5 +1,5 @@
 # jest-testcontainers
-_Forked from [trendyol/jest-testcontainers]((https://github.com/trendyol/jest-testcontainers)_
+_Forked from [trendyol/jest-testcontainers](https://github.com/trendyol/jest-testcontainers)_
 
 Jest preset for running docker containers with your tests. Primary purpose is to make it possible to use any database in integration tests. Since it uses docker images, custom database images with different plugins/configurations can be used in the integration tests. Using [testcontainers-node](https://github.com/testcontainers/testcontainers-node) under the hood. Inspired by [@shelf/jest-mongodb](https://github.com/shelfio/jest-mongodb).
 
