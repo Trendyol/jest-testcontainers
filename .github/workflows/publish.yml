@@ -1,8 +1,11 @@
 name: Test Jest-Containers
-on: push
+on: 
+  push:
+    branches:
+      - "master"
 
 jobs:
-  test_and_publish:
+  publish:
     runs-on: ubuntu-latest 
     permissions: 
       contents: read
@@ -21,7 +24,6 @@ jobs:
       - run: npm run example:redis
       - run: npm run example:redis-typescript
       - name: Publish NPM package publish
-        if: ${{ github.ref == 'ref/heads/main' }}
-        run: npm publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}

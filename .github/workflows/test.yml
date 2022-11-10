@@ -1,0 +1,21 @@
+name: Test Jest-Containers
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest 
+    permissions: 
+      contents: read
+      packages: write 
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/gallium'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm run test
+      - run: npm run example:redis
+      - run: npm run example:redis-typescript
