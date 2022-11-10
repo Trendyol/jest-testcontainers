@@ -7,7 +7,7 @@ If you are writing your tests with your Typescript, you don't have to choose bet
 Create a *preset.js*. 
 ```js
 const ts_preset = require('ts-jest/jest-preset');
-const testcontainers_preset = require('@trendyol/jest-testcontainers/jest-preset');
+const testcontainers_preset = require('@blueground/jest-testcontainers/jest-preset');
 
 module.exports = {
 	...ts_preset,

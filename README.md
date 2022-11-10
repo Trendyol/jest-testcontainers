@@ -1,21 +1,23 @@
 # jest-testcontainers
+_Forked from [trendyol/jest-testcontainers]((https://github.com/trendyol/jest-testcontainers)_
+
 Jest preset for running docker containers with your tests. Primary purpose is to make it possible to use any database in integration tests. Since it uses docker images, custom database images with different plugins/configurations can be used in the integration tests. Using [testcontainers-node](https://github.com/testcontainers/testcontainers-node) under the hood. Inspired by [@shelf/jest-mongodb](https://github.com/shelfio/jest-mongodb).
 
-[![Build Status](https://travis-ci.org/Trendyol/jest-testcontainers.svg?branch=master)](https://travis-ci.org/testcontainers/testcontainers-node)
-[![npm version](https://badge.fury.io/js/%40trendyol%2Fjest-testcontainers.svg)](https://badge.fury.io/js/%40trendyol%2Fjest-testcontainers)
+[![Test Jest-Containers](https://github.com/bluegroundltd/jest-testcontainers/actions/workflows/publish.yml/badge.svg?branch=master)](https://github.com/bluegroundltd/jest-testcontainers/actions/workflows/publish.yml)
+[![npm version](https://badge.fury.io/js/@blueground%2Fjest-testcontainers.svg)](https://badge.fury.io/js/@blueground%2Fjest-testcontainers)
 
 ## Usage
 ### Install
 Docker should be installed on your system. If running inside a CI pipeline, see [FAQ.md](./FAQ.md).
 
-```npm install --save-dev @trendyol/jest-testcontainers```
+```npm install --save-dev @blueground/jest-testcontainers```
 
 ### Edit Jest Config
 On your `jest.config.js` add the project as the preset.
 
 ```js
 module.exports = {
-  preset: '@trendyol/jest-testcontainers'
+  preset: '@blueground/jest-testcontainers'
 };
 ```
 
