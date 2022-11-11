@@ -1,6 +1,6 @@
 {
   "name": "@blueground/jest-testcontainers",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Jest preset for starting docker containers that stay up whilist your tests run.",
   "main": "dist/index",
   "types": "dist/index",
@@ -33,7 +33,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Trendyol/jest-testcontainers.git"
+    "url": "git+https://github.com/bluegroundltd/jest-testcontainers.git"
   },
   "keywords": [
     "jest",
