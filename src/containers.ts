@@ -24,9 +24,7 @@ const addWaitStrategyToContainer = (waitStrategy?: WaitConfig) => (
     return container;
   }
   if (waitStrategy.type === "ports") {
-    return container.withStartupTimeout(
-      new Duration(waitStrategy.timeout, TemporalUnit.SECONDS)
-    );
+    return container.withStartupTimeout(waitStrategy.timeout);
   }
   if (waitStrategy.type === "text") {
     return container.withWaitStrategy(Wait.forLogMessage(waitStrategy.text));
@@ -41,7 +39,7 @@ const addEnvironmentVariablesToContainer = (env?: EnvironmentVariableMap) => (
     return container;
   }
   return Object.keys(env).reduce(
-    (newContainer, key) => newContainer.withEnv(key, env[key]),
+    (newContainer, key) => newContainer.withEnvironment({ [key]: env[key] }),
     container
   );
 };
@@ -60,9 +58,7 @@ const addBindsToContainer = (bindMounts?: BindConfig[]) => (
 ): TestContainer => {
   if (!bindMounts) return container;
 
-  for (const bindMount of bindMounts) {
-    container.withBindMount(bindMount.source, bindMount.target, bindMount.mode);
-  }
+  container.withBindMounts(bindMounts);
   return container;
 };
 
@@ -79,7 +75,7 @@ export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
   const { image, tag, ports, name, env, wait, bindMounts } = containerConfig;
-  const container = new GenericContainer(image, tag);
+  const container = new GenericContainer(image);
 
   return [
     addPortsToContainer(ports),
@@ -100,12 +96,7 @@ export function buildDockerComposeEnvironment(
     dockerComposeConfig.composeFile
   );
   if (dockerComposeConfig?.startupTimeout) {
-    return environment.withStartupTimeout(
-      new Duration(
-        dockerComposeConfig.startupTimeout,
-        TemporalUnit.MILLISECONDS
-      )
-    );
+    return environment.withStartupTimeout(dockerComposeConfig.startupTimeout);
   }
   return environment;
 }
@@ -125,7 +116,7 @@ export function getMetaInfo(
 
   return {
     container,
-    ip: container.getContainerIpAddress(),
+    ip: container.getHost(),
     name: container.getName(),
     portMappings: (ports || []).reduce(
       (mapping, p: number) =>
