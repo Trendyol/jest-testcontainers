@@ -39,7 +39,7 @@ const addEnvironmentVariablesToContainer = (env?: EnvironmentVariableMap) => (
     return container;
   }
   return Object.keys(env).reduce(
-    (newContainer, key) => newContainer.withEnv(key, env[key]),
+    (newContainer, key) => newContainer.withEnvironment({ [key]: env[key] }),
     container
   );
 };
@@ -58,9 +58,7 @@ const addBindsToContainer = (bindMounts?: BindConfig[]) => (
 ): TestContainer => {
   if (!bindMounts) return container;
 
-  for (const bindMount of bindMounts) {
-    container.withBindMount(bindMount.source, bindMount.target, bindMount.mode);
-  }
+  container.withBindMounts(bindMounts);
   return container;
 };
 
