@@ -229,6 +229,29 @@ describe("containers", () => {
         }
       ]);
     });
+
+    it("should set cmd correctly", () => {
+      // Arrange
+      const config: SingleContainerConfig = {
+        cmd: ["echo", "'hi'"],
+        image: "alpine"
+      };
+
+      // Act
+      const actualContainer: any = buildTestcontainer(config);
+
+      // Assert
+      expect(actualContainer.image).toEqual("alpine");
+      expect(actualContainer.tag).toEqual("latest");
+      expect(actualContainer.ports).toEqual([]);
+      expect(actualContainer.env).toEqual({});
+      expect(actualContainer.waitStrategy).toEqual(undefined);
+      expect(actualContainer.startupTimeout).toEqual(
+        new Duration(60000, TemporalUnit.MILLISECONDS)
+      );
+      expect(actualContainer.bindMounts).toEqual([]);
+      expect(actualContainer.cmd).toEqual(["echo", "'hi'"]);
+    });
   });
 
   describe("buildDockerComposeEnvironment", () => {

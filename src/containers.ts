@@ -66,6 +66,15 @@ const addBindsToContainer = (bindMounts?: BindConfig[]) => (
   return container;
 };
 
+const addCmdToContainer = (cmd?: string[]) => (
+  container: TestContainer
+): TestContainer => {
+  if (!cmd) return container;
+
+  container.withCmd(cmd);
+  return container;
+};
+
 const addNameToContainer = (name?: string) => (
   container: GenericContainer
 ): TestContainer => {
@@ -78,14 +87,24 @@ const addNameToContainer = (name?: string) => (
 export function buildTestcontainer(
   containerConfig: SingleContainerConfig
 ): TestContainer {
-  const { image, tag, ports, name, env, wait, bindMounts } = containerConfig;
+  const {
+    image,
+    tag,
+    ports,
+    name,
+    env,
+    wait,
+    bindMounts,
+    cmd
+  } = containerConfig;
   const container = new GenericContainer(image, tag);
 
   return [
     addPortsToContainer(ports),
     addEnvironmentVariablesToContainer(env),
     addWaitStrategyToContainer(wait),
-    addBindsToContainer(bindMounts)
+    addBindsToContainer(bindMounts),
+    addCmdToContainer(cmd)
   ].reduce<TestContainer>(
     (res, func) => func(res),
     addNameToContainer(name)(container)
