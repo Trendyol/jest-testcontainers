@@ -154,8 +154,8 @@ function assertContainerConfigIsValid({
 
 function parseContainerConfig(config: any): JestTestcontainersConfig {
   assertContainerConfigIsValid(config);
-  const { image, tag, ports, name, env, wait, bindMounts } = config;
-  const parsed = { image, tag, ports, name, env, wait, bindMounts };
+  const { image, tag, ports, name, env, wait, bindMounts, cmd } = config;
+  const parsed = { image, tag, ports, name, env, wait, bindMounts, cmd };
 
   return Object.keys(parsed).reduce(
     (acc, key) => (key !== undefined ? { ...acc, [key]: config[key] } : acc),
