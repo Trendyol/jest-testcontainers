@@ -96,5 +96,3 @@ If you want to disable this behavior you can set the `JEST_TESTCONTAINERS_RESTAR
 
 ## License
 This project is licensed under the MIT License
-
-
